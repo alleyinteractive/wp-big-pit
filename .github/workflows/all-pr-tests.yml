@@ -41,3 +41,4 @@ jobs:
           wordpress-version: '${{ matrix.wordpress }}'
           skip-services: 'true'
           skip-wordpress-install: 'true'
+          audit-command: 'composer audit --no-dev --ansi --no-interaction'
