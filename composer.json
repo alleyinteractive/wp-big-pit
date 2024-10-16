@@ -2,7 +2,7 @@
     "name": "alleyinteractive/wp-big-pit",
     "description": "The WordPress database table for everything else.",
     "license": "GPL-2.0-or-later",
-    "type": "wordpress-plugin",
+    "type": "library",
     "authors": [
         {
             "name": "Alley",
