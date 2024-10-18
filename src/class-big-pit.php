@@ -213,7 +213,8 @@ CREATE TABLE {$wpdb->big_pit} (
 	item_id bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
 	item_group varchar(255) NOT NULL,
 	item_key varchar(255) NOT NULL,
-	item_value longtext NOT NULL
+	item_value longtext NOT NULL,
+	KEY group_key (item_group(191),item_key(191))
 ) {$wpdb->get_charset_collate()};
 SQL
 			);
