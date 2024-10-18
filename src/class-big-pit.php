@@ -56,8 +56,13 @@ final class Big_Pit implements Feature {
 			return;
 		}
 
-		$this->upsert();
-		$this->ready = true;
+		try {
+			$this->upsert();
+			$this->ready = true;
+		} catch ( \Exception $e ) {
+			// Do nothing.
+			unset( $e );
+		}
 	}
 
 	/**
@@ -184,6 +189,8 @@ final class Big_Pit implements Feature {
 
 	/**
 	 * Create or update the database table.
+	 *
+	 * @throws \Exception If database operations fail.
 	 */
 	private function upsert(): void {
 		global $wpdb;
@@ -200,7 +207,7 @@ final class Big_Pit implements Feature {
 		}
 
 		if ( ! $installed_version ) {
-			\dbDelta(
+			$delta = \dbDelta(
 				<<<SQL
 CREATE TABLE {$wpdb->big_pit} (
 	item_id bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
@@ -210,6 +217,10 @@ CREATE TABLE {$wpdb->big_pit} (
 ) {$wpdb->get_charset_collate()};
 SQL
 			);
+
+			if ( ! isset( $delta[ $wpdb->big_pit ] ) ) {
+				throw new \Exception( 'Failed to create table.' );
+			}
 
 			$installed_version = '1';
 		}
