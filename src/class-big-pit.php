@@ -214,7 +214,8 @@ CREATE TABLE {$wpdb->big_pit} (
 	item_group varchar(255) NOT NULL,
 	item_key varchar(255) NOT NULL,
 	item_value longtext NOT NULL,
-	KEY group_key (item_group(191),item_key(191))
+	KEY group_key (item_group(191),item_key(191)),
+	KEY key_value (item_key(191), item_value(100))
 ) {$wpdb->get_charset_collate()};
 SQL
 			);
