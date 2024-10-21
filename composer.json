@@ -11,7 +11,7 @@
     ],
     "homepage": "https://github.com/alleyinteractive/wp-big-pit",
     "require": {
-        "php": "^8.2",
+        "php": "^8.1",
         "alleyinteractive/composer-wordpress-autoloader": "^1.0",
         "alleyinteractive/wp-type-extensions": "^2.1"
     },

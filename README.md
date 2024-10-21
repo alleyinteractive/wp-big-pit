@@ -21,13 +21,12 @@ use Alley\WP\Big_Pit;
 $external_id  = 'abcdef12345';
 $api_response = '{"id":"abcdef12345","title":"The Best Movie Ever","rating":5}';
 
-Big_Pit::instance()->set( $external_id, $api_response, 'movie_reviews' );
+$big_pit = Big_Pit::instance();
 
-Big_Pit::instance()->get( $external_id, 'movie_reviews' ); // '{"id":"abcdef12345","title":"The Best Movie Ever","rating":5}'
-
-Big_Pit::instance()->delete( $external_id, 'movie_reviews' );
-
-Big_Pit::instance()->flush_group( 'movie_reviews' );
+$big_pit->set( $external_id, $api_response, 'movie_reviews' );
+$big_pit->get( $external_id, 'movie_reviews' ); // '{"id":"abcdef12345","title":"The Best Movie Ever","rating":5}'
+$big_pit->delete( $external_id, 'movie_reviews' );
+$big_pit->flush_group( 'movie_reviews' );
 ```
 
 ## About
