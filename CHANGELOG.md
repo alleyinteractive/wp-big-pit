@@ -4,6 +4,10 @@ This library adheres to [Semantic Versioning](https://semver.org/) and [Keep a C
 
 ## 0.2.0
 
+### Added
+
+- PSR-16 cache adapter.
+
 ### Changed
 
 - The minimum PHP version is now 8.1.
