@@ -1,6 +1,6 @@
 <?php
 /**
- * Big Pit Tests: CRUD operations
+ * Big Pit Tests: CrudUnitTest class file
  *
  * @package wp-big-pit
  */
@@ -10,6 +10,9 @@ namespace Alley\WP\Big_Pit\Tests\Unit;
 use Alley\WP\Big_Pit;
 use PHPUnit\Framework\TestCase;
 
+/**
+ * CRUD tests.
+ */
 class CrudUnitTest extends TestCase {
 	/**
 	 * Create the database table.
@@ -26,6 +29,7 @@ class CrudUnitTest extends TestCase {
 	public static function tearDownAfterClass(): void {
 		global $wpdb;
 
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.SchemaChange
 		$wpdb->query( 'DROP TABLE ' . $wpdb->big_pit );
 		delete_option( 'wp_big_pit_database_version' );
 
