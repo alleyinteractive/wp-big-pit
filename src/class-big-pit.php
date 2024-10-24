@@ -208,7 +208,6 @@ final class Big_Pit implements Feature {
 
 		// Ensure the database version is at least version 2.
 		if ( ! $installed_version || '1' === $installed_version ) {
-
 			/*
 			 * Create the table if this is a new installation or if this is a site in
 			 * a multisite that didn't get a site-specific table at version 1.
