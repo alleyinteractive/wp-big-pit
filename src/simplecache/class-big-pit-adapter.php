@@ -41,7 +41,8 @@ final class Big_Pit_Adapter implements CacheInterface {
 					limit: 172,
 					origin: new self(
 						pit: Big_Pit::instance(),
-						group: $group,
+						// Prefix the group so that `flush()` doesn't wipe out other data.
+						group: "_psr16_{$group}",
 					),
 				),
 			),
