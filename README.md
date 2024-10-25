@@ -53,6 +53,18 @@ $cache->clear();
 
 Note that the cache adapter will store data in a custom array structure, as described [in the wp-psr16 README](https://github.com/alleyinteractive/wp-psr16/blob/5ff411661f9682b3184dab596180a7a3edcaf446/README.md#implementation-details).
 
+## Why Not Use Options?
+
+There's nothing wrong with using options for storing key-value data, but it comes with overhead, including:
+
+- Managing autoloading and the `alloptions` cache.
+- `pre_option_` and `option_` filters on the values.
+- Settings registration and default values.
+
+Big Pit doesn't have autoloading, filters, or registered keys, so it might work for you if you don't need these features.
+
+Or, you might plan to store thousands of rows, and you don't want to dilute the options table with that amount of data.
+
 ## About
 
 ### License

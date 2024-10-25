@@ -50,7 +50,7 @@ final class Big_Pit implements Feature {
 	public function boot(): void {
 		global $wpdb;
 
-		$wpdb->big_pit = $wpdb->base_prefix . 'big_pit';
+		$wpdb->big_pit = $wpdb->get_blog_prefix() . 'big_pit';
 
 		if ( defined( 'WP_INSTALLING' ) ) {
 			return;
@@ -195,7 +195,7 @@ final class Big_Pit implements Feature {
 	private function upsert(): void {
 		global $wpdb;
 
-		$available_version = '1';
+		$available_version = '2';
 		$installed_version = get_option( 'wp_big_pit_database_version', '0' );
 
 		if ( $available_version === $installed_version ) {
@@ -206,9 +206,15 @@ final class Big_Pit implements Feature {
 			require_once ABSPATH . '/wp-admin/includes/upgrade.php';
 		}
 
-		if ( ! $installed_version ) {
-			$delta = \dbDelta(
-				<<<SQL
+		// Ensure the database version is at least version 2.
+		if ( ! $installed_version || '1' === $installed_version ) {
+			/*
+			 * Create the table if this is a new installation or if this is a site in
+			 * a multisite that didn't get a site-specific table at version 1.
+			 */
+			if ( ! $installed_version || $wpdb->blogid > 1 ) {
+				$delta = \dbDelta(
+					<<<SQL
 CREATE TABLE {$wpdb->big_pit} (
 	item_id bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
 	item_group varchar(255) NOT NULL,
@@ -218,13 +224,14 @@ CREATE TABLE {$wpdb->big_pit} (
 	KEY key_value (item_key(191), item_value(100))
 ) {$wpdb->get_charset_collate()};
 SQL
-			);
+				);
 
-			if ( ! isset( $delta[ $wpdb->big_pit ] ) ) {
-				throw new \Exception( 'Failed to create table.' );
+				if ( ! isset( $delta[ $wpdb->big_pit ] ) ) {
+					throw new \Exception( 'Failed to create table.' );
+				}
 			}
 
-			$installed_version = '1';
+			$installed_version = '2';
 		}
 
 		update_option( 'wp_big_pit_database_version', $installed_version );
