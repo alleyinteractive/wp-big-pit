@@ -19,13 +19,14 @@ jobs:
       matrix:
         php: [8.1, 8.2, 8.3]
         wordpress: ["latest"]
+        multisite: [false, true]
     runs-on: ubuntu-latest
     # Cancel any existing runs of this workflow
     concurrency:
-      group: ${{ github.workflow }}-${{ github.event_name }}-${{ github.event.pull_request.number || github.ref }}-P${{ matrix.php }}-WP${{ matrix.wordpress }}
+      group: ${{ github.workflow }}-${{ github.event_name }}-${{ github.event.pull_request.number || github.ref }}-P${{ matrix.php }}-WP${{ matrix.wordpress }}-MS${{ matrix.multisite }}
       cancel-in-progress: true
     # Name the job in the matrix
-    name: "PR Tests PHP ${{ matrix.php }} WordPress ${{ matrix.wordpress }}"
+    name: "PR Tests PHP ${{ matrix.php }} WordPress ${{ matrix.wordpress }} multisite ${{ matrix.multisite }}"
     steps:
       - uses: actions/checkout@v4
 
@@ -38,7 +39,7 @@ jobs:
         uses: alleyinteractive/action-test-php@develop
         with:
           php-version: '${{ matrix.php }}'
+          audit-command: "composer audit --no-dev --ansi --no-interaction"
           wordpress-version: '${{ matrix.wordpress }}'
-          skip-services: 'true'
+          wordpress-multisite: '${{ matrix.multisite }}'
           skip-wordpress-install: 'true'
-          audit-command: 'composer audit --no-dev --ansi --no-interaction'
