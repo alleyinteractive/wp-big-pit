@@ -92,6 +92,7 @@ final class Big_Pit implements Feature {
 			$value = $this->cache[ $group ][ $key ];
 
 			if ( is_object( $value ) ) {
+				// Don't reuse the same instance across multiple calls.
 				$value = clone $value;
 			}
 
