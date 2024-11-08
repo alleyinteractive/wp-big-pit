@@ -31,6 +31,15 @@ final class Big_Pit implements Feature {
 	private bool $ready = false;
 
 	/**
+	 * Cached values.
+	 *
+	 * @phpstan-var array<string, array<string, mixed>>
+	 *
+	 * @var array[]
+	 */
+	private array $cache = [];
+
+	/**
 	 * Instance.
 	 *
 	 * @return self
@@ -79,6 +88,16 @@ final class Big_Pit implements Feature {
 			return null;
 		}
 
+		if ( isset( $this->cache[ $group ] ) && array_key_exists( $key, $this->cache[ $group ] ) ) {
+			$value = $this->cache[ $group ][ $key ];
+
+			if ( is_object( $value ) ) {
+				$value = clone $value;
+			}
+
+			return $value;
+		}
+
 		$value = $wpdb->get_var(
 			$wpdb->prepare(
 				"SELECT item_value FROM {$wpdb->big_pit} WHERE item_group = %s AND item_key = %s LIMIT 1",
@@ -90,6 +109,8 @@ final class Big_Pit implements Feature {
 		if ( is_string( $value ) ) {
 			$value = maybe_unserialize( $value );
 		}
+
+		$this->cache[ $group ][ $key ] = $value;
 
 		return $value;
 	}
@@ -141,6 +162,8 @@ final class Big_Pit implements Feature {
 				[ '%s', '%s', '%s' ],
 			);
 		}
+
+		unset( $this->cache[ $group ][ $key ] );
 	}
 
 	/**
@@ -164,6 +187,8 @@ final class Big_Pit implements Feature {
 			],
 			[ '%s', '%s' ],
 		);
+
+		unset( $this->cache[ $group ][ $key ] );
 	}
 
 	/**
@@ -185,6 +210,8 @@ final class Big_Pit implements Feature {
 			],
 			[ '%s' ],
 		);
+
+		unset( $this->cache[ $group ] );
 	}
 
 	/**
