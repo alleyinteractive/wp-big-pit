@@ -10,13 +10,33 @@ You can install the package via Composer:
 composer require alleyinteractive/wp-big-pit
 ```
 
-## Usage
+## API
+
+The `Alley\WP\Big_Pit\Client` interface describes the create-read-update-delete operations that can be used with the Big Pit. You can type hint against this interface when using Big Pit as a dependency.
+
+```php
+namespace Alley\WP\Big_Pit;
+
+use Alley\WP\Types\Feature;
+
+interface Client extends Feature {
+	public function get( string $key, string $group ): mixed;
+
+	public function set( string $key, mixed $value, string $group ): void;
+
+	public function delete( string $key, string $group ): void;
+
+	public function flush_group( string $group ): void;
+}
+```
 
 Each item in the Big Pit has a key and a group, much like the WordPress object cache. Each key is unique within a group.
 
-### Direct Access
+`Client` extends the `Alley\WP\Types\Feature` interface from the [Type Extensions]() library, which includes a `boot()` method for performing side effects.
 
-You can perform CRUD operations directly on The Pit:
+You must call `boot()` before using the client. If you are compiling features using the `Features` instance from Type Extensions, you can include the Big Pit client, and it will be booted with the rest of your feature classes.
+
+## Usage
 
 ```php
 <?php
@@ -26,12 +46,30 @@ use Alley\WP\Big_Pit;
 $external_id  = 'abcdef12345';
 $api_response = '{"id":"abcdef12345","title":"The Best Movie Ever","rating":5}';
 
-$big_pit = Big_Pit::instance();
+$big_pit = new Big_Pit\Big_Pit();
+$big_pit->boot();
 
 $big_pit->set( $external_id, $api_response, 'movie_reviews' );
 $big_pit->get( $external_id, 'movie_reviews' ); // '{"id":"abcdef12345","title":"The Best Movie Ever","rating":5}'
 $big_pit->delete( $external_id, 'movie_reviews' );
 $big_pit->flush_group( 'movie_reviews' );
+```
+
+### Speculative Client
+
+The `Big_Speculative_Pit` decorator class tracks the items that are fetched during a given request and preloads those items in a single query the next time the same page is requested.
+
+```php
+<?php
+
+use Alley\WP\Big_Pit;
+
+$request = \Symfony\Component\HttpFoundation\Request::createFromGlobals();
+
+$big_pit = new Big_Pit\Big_Speculative_Pit(
+  request: $request,
+  origin: new Big_Pit\Big_Pit(),
+);
 ```
 
 ### PSR-16 Cache Adapter

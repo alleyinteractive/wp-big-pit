@@ -7,7 +7,7 @@
 
 namespace Alley\WP\Big_Pit\Tests\Unit;
 
-use Alley\WP\Big_Pit;
+use Alley\WP\Big_Pit\Big_Pit;
 use Alley\WP\Big_Pit\Tests\TestCase;
 
 /**
@@ -20,7 +20,8 @@ class InMemoryCacheTest extends TestCase {
 	public function test_in_memory_cache() {
 		global $wpdb;
 
-		$big_pit = Big_Pit::instance();
+		$big_pit = new Big_Pit();
+		$big_pit->boot();
 
 		// Two fetches of the same key should only result in one query.
 		$num_queries_before = $wpdb->num_queries;
@@ -63,7 +64,8 @@ class InMemoryCacheTest extends TestCase {
 	 * Check for improper reuse of a cached object.
 	 */
 	public function test_cached_object_reference() {
-		$big_pit = Big_Pit::instance();
+		$big_pit = new Big_Pit();
+		$big_pit->boot();
 		$big_pit->set( 'key1', (object) [ 'foo' => 'bar' ], 'group1' );
 		$this->assertNotSame( $big_pit->get( 'key1', 'group1' ), $big_pit->get( 'key1', 'group1' ) );
 	}
