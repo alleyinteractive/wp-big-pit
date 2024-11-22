@@ -57,6 +57,8 @@ final class Big_Pit implements Client {
 	public function get( string $key, string $group ): mixed {
 		global $wpdb;
 
+		assert( $wpdb instanceof \wpdb );
+
 		if ( ! isset( $wpdb->big_pit ) ) {
 			return null;
 		}
@@ -67,7 +69,8 @@ final class Big_Pit implements Client {
 
 		$value = $wpdb->get_var(
 			$wpdb->prepare(
-				"SELECT item_value FROM {$wpdb->big_pit} WHERE item_group = %s AND item_key = %s LIMIT 1",
+				'SELECT item_value FROM %i WHERE item_group = %s AND item_key = %s LIMIT 1',
+				$wpdb->big_pit,
 				$group,
 				$key
 			),
@@ -92,6 +95,8 @@ final class Big_Pit implements Client {
 	public function set( string $key, mixed $value, string $group ): void {
 		global $wpdb;
 
+		assert( $wpdb instanceof \wpdb );
+
 		if ( ! isset( $wpdb->big_pit ) ) {
 			return;
 		}
@@ -100,7 +105,8 @@ final class Big_Pit implements Client {
 
 		$exists = $wpdb->get_var(
 			$wpdb->prepare(
-				"SELECT item_id FROM {$wpdb->big_pit} WHERE item_group = %s AND item_key = %s LIMIT 1",
+				'SELECT item_id FROM %i WHERE item_group = %s AND item_key = %s LIMIT 1',
+				$wpdb->big_pit,
 				$group,
 				$key
 			),
@@ -142,6 +148,8 @@ final class Big_Pit implements Client {
 	public function delete( string $key, string $group ): void {
 		global $wpdb;
 
+		assert( $wpdb instanceof \wpdb );
+
 		if ( ! isset( $wpdb->big_pit ) ) {
 			return;
 		}
@@ -166,6 +174,8 @@ final class Big_Pit implements Client {
 	public function flush_group( string $group ): void {
 		global $wpdb;
 
+		assert( $wpdb instanceof \wpdb );
+
 		if ( ! isset( $wpdb->big_pit ) ) {
 			return;
 		}
@@ -189,10 +199,16 @@ final class Big_Pit implements Client {
 	private function upsert(): void {
 		global $wpdb;
 
+		assert( $wpdb instanceof \wpdb );
+
 		$available_version = '2';
 		$installed_version = get_option( 'wp_big_pit_database_version', '0' );
 
 		if ( $available_version === $installed_version ) {
+			return;
+		}
+
+		if ( ! isset( $wpdb->big_pit ) ) {
 			return;
 		}
 

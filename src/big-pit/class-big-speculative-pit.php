@@ -143,6 +143,8 @@ final class Big_Speculative_Pit implements Client {
 	private function preload(): void {
 		global $wpdb;
 
+		assert( $wpdb instanceof \wpdb );
+
 		if ( ! isset( $wpdb->big_pit ) ) {
 			return;
 		}
@@ -157,9 +159,10 @@ final class Big_Speculative_Pit implements Client {
 			$items = $wpdb->get_results( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 				$wpdb->prepare( // phpcs:ignore WordPress.DB.PreparedSQLPlaceholders.ReplacementsWrongNumber
 					'SELECT item_key, item_value'
-					. " FROM {$wpdb->big_pit}"
+					. ' FROM %i'
 					. ' WHERE item_group = %s'
 					. ' AND item_key IN (' . implode( ',', array_fill( 0, count( $keys ), '%s' ) ) . ')',
+					$wpdb->big_pit,
 					$group,
 					...$keys,
 				),
