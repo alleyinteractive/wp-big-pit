@@ -32,7 +32,7 @@ interface Client extends Feature {
 
 Each item in the Big Pit has a key and a group, much like the WordPress object cache. Each key is unique within a group.
 
-`Client` extends the `Alley\WP\Types\Feature` interface from the [Type Extensions]() library, which includes a `boot()` method for performing side effects.
+`Client` extends the `Alley\WP\Types\Feature` interface from the [Type Extensions](https://github.com/alleyinteractive/wp-type-extensions) library, which includes a `boot()` method for performing side effects.
 
 You must call `boot()` before using the client. If you are compiling features using the `Features` instance from Type Extensions, you can include the Big Pit client, and it will be booted with the rest of your feature classes.
 
