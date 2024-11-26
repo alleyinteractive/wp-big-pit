@@ -2,6 +2,24 @@
 
 This library adheres to [Semantic Versioning](https://semver.org/) and [Keep a CHANGELOG](https://keepachangelog.com/en/1.0.0/).
 
+## 0.5.0
+
+### Added
+
+- `Client` interface, extending `Alley\WP\Types\Feature`, for implementing a Big Pit client.
+- `Items` class for clients that want to keep their own in-memory cache of fetched items.
+- `Big_Speculative_Pit` client for preloading items used the last time a URL was requested.
+
+### Changed
+
+- `Big_Pit` is now in the `Alley\WP\Big_Pit` subnamespace, implements the `Client` interface, and must be instantiated with the `new` keyword.
+- The `boot()` method on clients must be called manually.
+- The `$wpdb->big_pit` property will be unset if the table is not available.
+
+### Removed
+
+- `Big_Pit::instance()` method.
+
 ## 0.4.0
 
 ### Added

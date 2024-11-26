@@ -8,49 +8,24 @@
 // phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery
 // phpcs:disable WordPress.DB.DirectDatabaseQuery.NoCaching
 
-namespace Alley\WP;
-
-use Alley\WP\Types\Feature;
+namespace Alley\WP\Big_Pit;
 
 /**
  * The Big Pit.
  */
-final class Big_Pit implements Feature {
+final class Big_Pit implements Client {
 	/**
-	 * Singleton.
+	 * Fetched items.
 	 *
-	 * @var self
+	 * @var Items
 	 */
-	private static ?self $instance = null;
+	private readonly Items $items;
 
 	/**
-	 * Whether the database is ready to accept queries.
-	 *
-	 * @var bool
+	 * Constructor.
 	 */
-	private bool $ready = false;
-
-	/**
-	 * Cached values.
-	 *
-	 * @phpstan-var array<string, array<string, mixed>>
-	 *
-	 * @var array[]
-	 */
-	private array $cache = [];
-
-	/**
-	 * Instance.
-	 *
-	 * @return self
-	 */
-	public static function instance(): self {
-		if ( null === self::$instance ) {
-			self::$instance = new self();
-			self::$instance->boot();
-		}
-
-		return self::$instance;
+	public function __construct() {
+		$this->items = new Items();
 	}
 
 	/**
@@ -67,10 +42,8 @@ final class Big_Pit implements Feature {
 
 		try {
 			$this->upsert();
-			$this->ready = true;
 		} catch ( \Exception $e ) {
-			// Do nothing.
-			unset( $e );
+			unset( $wpdb->big_pit );
 		}
 	}
 
@@ -84,24 +57,20 @@ final class Big_Pit implements Feature {
 	public function get( string $key, string $group ): mixed {
 		global $wpdb;
 
-		if ( ! $this->ready ) {
+		assert( $wpdb instanceof \wpdb );
+
+		if ( ! isset( $wpdb->big_pit ) ) {
 			return null;
 		}
 
-		if ( isset( $this->cache[ $group ] ) && array_key_exists( $key, $this->cache[ $group ] ) ) {
-			$value = $this->cache[ $group ][ $key ];
-
-			if ( is_object( $value ) ) {
-				// Don't reuse the same instance across multiple calls.
-				$value = clone $value;
-			}
-
-			return $value;
+		if ( $this->items->has( $key, $group ) ) {
+			return $this->items->get( $key, $group );
 		}
 
 		$value = $wpdb->get_var(
 			$wpdb->prepare(
-				"SELECT item_value FROM {$wpdb->big_pit} WHERE item_group = %s AND item_key = %s LIMIT 1",
+				'SELECT item_value FROM %i WHERE item_group = %s AND item_key = %s LIMIT 1',
+				$wpdb->big_pit,
 				$group,
 				$key
 			),
@@ -111,7 +80,7 @@ final class Big_Pit implements Feature {
 			$value = maybe_unserialize( $value );
 		}
 
-		$this->cache[ $group ][ $key ] = $value;
+		$this->items->add( $key, $value, $group );
 
 		return $value;
 	}
@@ -126,7 +95,9 @@ final class Big_Pit implements Feature {
 	public function set( string $key, mixed $value, string $group ): void {
 		global $wpdb;
 
-		if ( ! $this->ready ) {
+		assert( $wpdb instanceof \wpdb );
+
+		if ( ! isset( $wpdb->big_pit ) ) {
 			return;
 		}
 
@@ -134,7 +105,8 @@ final class Big_Pit implements Feature {
 
 		$exists = $wpdb->get_var(
 			$wpdb->prepare(
-				"SELECT item_id FROM {$wpdb->big_pit} WHERE item_group = %s AND item_key = %s LIMIT 1",
+				'SELECT item_id FROM %i WHERE item_group = %s AND item_key = %s LIMIT 1',
+				$wpdb->big_pit,
 				$group,
 				$key
 			),
@@ -164,7 +136,7 @@ final class Big_Pit implements Feature {
 			);
 		}
 
-		unset( $this->cache[ $group ][ $key ] );
+		$this->items->remove( $key, $group );
 	}
 
 	/**
@@ -176,7 +148,9 @@ final class Big_Pit implements Feature {
 	public function delete( string $key, string $group ): void {
 		global $wpdb;
 
-		if ( ! $this->ready ) {
+		assert( $wpdb instanceof \wpdb );
+
+		if ( ! isset( $wpdb->big_pit ) ) {
 			return;
 		}
 
@@ -189,7 +163,7 @@ final class Big_Pit implements Feature {
 			[ '%s', '%s' ],
 		);
 
-		unset( $this->cache[ $group ][ $key ] );
+		$this->items->remove( $key, $group );
 	}
 
 	/**
@@ -200,7 +174,9 @@ final class Big_Pit implements Feature {
 	public function flush_group( string $group ): void {
 		global $wpdb;
 
-		if ( ! $this->ready ) {
+		assert( $wpdb instanceof \wpdb );
+
+		if ( ! isset( $wpdb->big_pit ) ) {
 			return;
 		}
 
@@ -212,7 +188,7 @@ final class Big_Pit implements Feature {
 			[ '%s' ],
 		);
 
-		unset( $this->cache[ $group ] );
+		$this->items->remove_group( $group );
 	}
 
 	/**
@@ -223,10 +199,16 @@ final class Big_Pit implements Feature {
 	private function upsert(): void {
 		global $wpdb;
 
+		assert( $wpdb instanceof \wpdb );
+
 		$available_version = '2';
 		$installed_version = get_option( 'wp_big_pit_database_version', '0' );
 
 		if ( $available_version === $installed_version ) {
+			return;
+		}
+
+		if ( ! isset( $wpdb->big_pit ) ) {
 			return;
 		}
 

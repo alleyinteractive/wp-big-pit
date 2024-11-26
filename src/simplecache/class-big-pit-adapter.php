@@ -7,7 +7,7 @@
 
 namespace Alley\WP\SimpleCache;
 
-use Alley\WP\Big_Pit;
+use Alley\WP\Big_Pit\Client;
 use Psr\SimpleCache\CacheInterface;
 use Symfony\Component\Clock\NativeClock;
 
@@ -18,21 +18,24 @@ final class Big_Pit_Adapter implements CacheInterface {
 	/**
 	 * Constructor.
 	 *
-	 * @param Big_Pit $pit   Big Pit instance.
-	 * @param string  $group Cache group.
+	 * @param Client $pit   Big Pit client.
+	 * @param string $group Cache group.
 	 */
 	private function __construct(
-		private readonly Big_Pit $pit,
+		private readonly Client $pit,
 		private readonly string $group,
 	) {}
 
 	/**
 	 * Create an instance using the default composition.
 	 *
-	 * @param string $group Cache group.
+	 * @throws Invalid_Argument_Exception For invalid arguments.
+	 *
+	 * @param string $group  Cache group.
+	 * @param Client $client Big Pit client.
 	 * @return CacheInterface
 	 */
-	public static function create( string $group ): CacheInterface {
+	public static function create( string $group, Client $client ): CacheInterface {
 		return new PSR16_Compliant(
 			clock: new NativeClock(),
 			origin: new Prefixed_Keys(
@@ -40,7 +43,7 @@ final class Big_Pit_Adapter implements CacheInterface {
 				origin: new Maximum_Key_Length(
 					limit: 172,
 					origin: new self(
-						pit: Big_Pit::instance(),
+						pit: $client,
 						// Prefix the group so that `flush()` doesn't wipe out other data.
 						group: "_psr16_{$group}",
 					),
