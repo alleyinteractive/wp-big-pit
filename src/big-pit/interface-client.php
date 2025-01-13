@@ -40,6 +40,14 @@ interface Client extends Feature {
 	public function delete( string $key, string $group ): void;
 
 	/**
+	 * Get all values in a group.
+	 *
+	 * @param string $group Item group.
+	 * @return Item[]
+	 */
+	public function group( string $group ): iterable;
+
+	/**
 	 * Delete all values in a group.
 	 *
 	 * @param string $group Item group.

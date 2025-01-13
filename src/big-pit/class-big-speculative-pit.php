@@ -109,6 +109,16 @@ final class Big_Speculative_Pit implements Client {
 	}
 
 	/**
+	 * Get all values in a group.
+	 *
+	 * @param string $group Item group.
+	 * @return Item[]
+	 */
+	public function group( string $group ): iterable {
+		return $this->origin->group( $group );
+	}
+
+	/**
 	 * Delete all values in a group.
 	 *
 	 * @param string $group Item group.
