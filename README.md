@@ -26,6 +26,8 @@ interface Client extends Feature {
 
 	public function delete( string $key, string $group ): void;
 
+	public function group( string $key ): iterable;
+
 	public function flush_group( string $group ): void;
 }
 ```

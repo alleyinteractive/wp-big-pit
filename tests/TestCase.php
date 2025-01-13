@@ -59,5 +59,21 @@ abstract class TestCase extends TestkitTest_Case {
 
 		// key3 should still be there.
 		$this->assertSame( $val3, $client->value( $key3, $grp2 ) );
+
+		// Put key1 and key2 back in.
+		$client->set( $key1, $val1, $grp1 );
+		$client->set( $key2, $val2, $grp1 );
+
+		// The values in the group should be key1 or key2.
+		foreach ( $client->group( $grp1 ) as $item ) {
+			$this->assertTrue( $item->value === $val1 || $item->value === $val2 );
+
+			// Delete the item.
+			$item->delete();
+		}
+
+		// Assert that the group is empty again.
+		$this->assertNull( $client->value( $key1, $grp1 ) );
+		$this->assertNull( $client->value( $key2, $grp1 ) );
 	}
 }
