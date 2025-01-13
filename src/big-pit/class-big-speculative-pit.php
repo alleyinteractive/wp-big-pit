@@ -75,14 +75,14 @@ final class Big_Speculative_Pit implements Client {
 	 * @param string $group Item group.
 	 * @return mixed|null
 	 */
-	public function get( string $key, string $group ): mixed {
+	public function value( string $key, string $group ): mixed {
 		$this->fetched_keys[ $group ][] = $key;
 
 		if ( $this->items->has( $key, $group ) ) {
 			return $this->items->get( $key, $group );
 		}
 
-		return $this->origin->get( $key, $group );
+		return $this->origin->value( $key, $group );
 	}
 
 	/**
@@ -159,7 +159,7 @@ final class Big_Speculative_Pit implements Client {
 			return;
 		}
 
-		$saved = $this->origin->get( $this->key(), 'big_speculative_pit' );
+		$saved = $this->origin->value( $this->key(), 'big_speculative_pit' );
 
 		$this->saved_keys = is_array( $saved ) ? $saved : [];
 

@@ -54,7 +54,7 @@ final class Big_Pit implements Client {
 	 * @param string $group Item group.
 	 * @return mixed|null
 	 */
-	public function get( string $key, string $group ): mixed {
+	public function value( string $key, string $group ): mixed {
 		global $wpdb;
 
 		assert( $wpdb instanceof \wpdb );

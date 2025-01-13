@@ -20,7 +20,7 @@ interface Client extends Feature {
 	 * @param string $group Item group.
 	 * @return mixed|null
 	 */
-	public function get( string $key, string $group ): mixed;
+	public function value( string $key, string $group ): mixed;
 
 	/**
 	 * Set a value.

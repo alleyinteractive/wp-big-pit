@@ -20,7 +20,7 @@ namespace Alley\WP\Big_Pit;
 use Alley\WP\Types\Feature;
 
 interface Client extends Feature {
-	public function get( string $key, string $group ): mixed;
+	public function value( string $key, string $group ): mixed;
 
 	public function set( string $key, mixed $value, string $group ): void;
 
@@ -50,7 +50,7 @@ $big_pit = new Big_Pit\Big_Pit();
 $big_pit->boot();
 
 $big_pit->set( $external_id, $api_response, 'movie_reviews' );
-$big_pit->get( $external_id, 'movie_reviews' ); // '{"id":"abcdef12345","title":"The Best Movie Ever","rating":5}'
+$big_pit->value( $external_id, 'movie_reviews' ); // '{"id":"abcdef12345","title":"The Best Movie Ever","rating":5}'
 $big_pit->delete( $external_id, 'movie_reviews' );
 $big_pit->flush_group( 'movie_reviews' );
 ```
