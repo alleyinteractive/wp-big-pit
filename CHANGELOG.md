@@ -2,6 +2,17 @@
 
 This library adheres to [Semantic Versioning](https://semver.org/) and [Keep a CHANGELOG](https://keepachangelog.com/en/1.0.0/).
 
+## 0.6.0
+
+### Added
+
+- `group()` method to `Client` interface for fetching all items in a group.
+- `Item` class representing a single item.
+
+### Changed
+
+- The `Client::get()` method was renamed `value()`.
+
 ## 0.5.0
 
 ### Added

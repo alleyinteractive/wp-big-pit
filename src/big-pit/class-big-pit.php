@@ -54,7 +54,7 @@ final class Big_Pit implements Client {
 	 * @param string $group Item group.
 	 * @return mixed|null
 	 */
-	public function get( string $key, string $group ): mixed {
+	public function value( string $key, string $group ): mixed {
 		global $wpdb;
 
 		assert( $wpdb instanceof \wpdb );
@@ -164,6 +164,56 @@ final class Big_Pit implements Client {
 		);
 
 		$this->items->remove( $key, $group );
+	}
+
+	/**
+	 * Get all items in a group.
+	 *
+	 * @param string $group Item group.
+	 * @return Item[]
+	 */
+	public function group( string $group ): iterable {
+		global $wpdb;
+
+		assert( $wpdb instanceof \wpdb );
+
+		if ( ! isset( $wpdb->big_pit ) ) {
+			return [];
+		}
+
+		$min_id = 0;
+
+		do {
+			$results = $wpdb->get_results(
+				$wpdb->prepare(
+					'SELECT * FROM %i WHERE item_group = %s AND item_id > %d ORDER BY item_id LIMIT 100',
+					$wpdb->big_pit,
+					$group,
+					$min_id
+				),
+				ARRAY_A,
+			);
+
+			$count   = is_countable( $results ) ? count( $results ) : 0;
+			$min_id += $count;
+
+			if ( is_array( $results ) ) {
+				foreach ( $results as $result ) {
+					if (
+						! isset( $result['item_id'], $result['item_key'], $result['item_value'] )
+						|| ! is_numeric( $result['item_id'] )
+						|| ! is_string( $result['item_key'] )
+						|| ! is_string( $result['item_value'] )
+					) {
+						continue;
+					}
+
+					$min_id = max( $min_id, (int) $result['item_id'] );
+
+					yield new Item( $result['item_key'], maybe_unserialize( $result['item_value'] ), $group, $this );
+				}
+			}
+		} while ( $count > 0 );
 	}
 
 	/**

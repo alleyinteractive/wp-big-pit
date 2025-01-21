@@ -20,7 +20,7 @@ interface Client extends Feature {
 	 * @param string $group Item group.
 	 * @return mixed|null
 	 */
-	public function get( string $key, string $group ): mixed;
+	public function value( string $key, string $group ): mixed;
 
 	/**
 	 * Set a value.
@@ -38,6 +38,14 @@ interface Client extends Feature {
 	 * @param string $group Item group.
 	 */
 	public function delete( string $key, string $group ): void;
+
+	/**
+	 * Get all values in a group.
+	 *
+	 * @param string $group Item group.
+	 * @return Item[]
+	 */
+	public function group( string $group ): iterable;
 
 	/**
 	 * Delete all values in a group.

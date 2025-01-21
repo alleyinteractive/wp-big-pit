@@ -62,7 +62,7 @@ final class Big_Pit_Adapter implements CacheInterface {
 	 * @return mixed The value of the item from the cache, or $default in case of cache miss.
 	 */
 	public function get( string $key, mixed $default = null ): mixed {
-		$value = $this->pit->get( $key, $this->group );
+		$value = $this->pit->value( $key, $this->group );
 
 		return $value ?? $default;
 	}
