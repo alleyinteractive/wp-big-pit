@@ -2,6 +2,12 @@
 
 This library adheres to [Semantic Versioning](https://semver.org/) and [Keep a CHANGELOG](https://keepachangelog.com/en/1.0.0/).
 
+## 0.7.0
+
+### Added
+
+- Support for Symfony 7 components.
+
 ## 0.6.0
 
 ### Added
